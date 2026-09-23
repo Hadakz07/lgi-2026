@@ -26,4 +26,6 @@ export const estudiantesConPromedio= estudiantes.map(est=>{
 const aprobados=estudiantesConPromedio.filter(est=>est.aprobado);
 
 console.log("Todos los estudiantes con su promedio: ",estudiantesConPromedio);
-console.log("Estudiantes aprobados: ",aprobados)
+console.log("Estudiantes aprobados: ",aprobados);
+console.table(estudiantesConPromedio);
+console.table(aprobados);
