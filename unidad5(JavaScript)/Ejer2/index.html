@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio 2 — Funciones, Arrays y Formulario</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --warning: #d97706;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      margin: 0;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      align-items: end;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    input {
+      padding: 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+
+    input:focus {
+      outline: 2px solid var(--primary);
+      border-color: transparent;
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #b91c1c;
+    }
+
+    .btn-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .error-msg {
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      color: var(--danger);
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    /* Tabla */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background-color: #f1f5f9;
+      font-weight: 600;
+    }
+
+    .badge {
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .badge-aprobado {
+      background-color: #dcfce7;
+      color: var(--success);
+    }
+
+    .badge-desaprobado {
+      background-color: #fee2e2;
+      color: var(--danger);
+    }
+
+    /* Resumen */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .summary-box .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .summary-box .label {
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Gestión de Calificaciones de Estudiantes</h1>
+    <p class="subtitle">Unidad 5A — JavaScript Fundamentos (Ejercicio 2)</p>
+
+    <!-- Formulario -->
+    <div class="card">
+      <form id="formEstudiante">
+        <div class="form-group">
+          <label for="inputNombre">Nombre del estudiante</label>
+          <input type="text" id="inputNombre" placeholder="Ej. Ana Pérez" required>
+        </div>
+
+        <div class="form-group">
+          <label for="inputNotas">Notas (separadas por coma)</label>
+          <input type="text" id="inputNotas" placeholder="Ej. 8, 9, 7.5" required>
+        </div>
+
+        <div class="form-group">
+          <label for="inputNotaMinima">Nota mínima de aprobación</label>
+          <input type="number" id="inputNotaMinima" value="6" min="1" max="10" step="0.5" required>
+        </div>
+
+        <div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Agregar Estudiante</button>
+        </div>
+      </form>
+
+      <div id="errorMsg" class="error-msg"></div>
+    </div>
+
+    <!-- Resumen del Grupo -->
+    <div class="card">
+      <h2>Resumen del Grupo</h2>
+      <div class="summary-grid">
+        <div class="summary-box">
+          <div class="value" id="resTotal">0</div>
+          <div class="label">Total Estudiantes</div>
+        </div>
+        <div class="summary-box">
+          <div class="value" id="resAprobados">0</div>
+          <div class="label">Aprobados</div>
+        </div>
+        <div class="summary-box">
+          <div class="value" id="resDesaprobados">0</div>
+          <div class="label">Desaprobados</div>
+        </div>
+        <div class="summary-box">
+          <div class="value" id="resPromedioGeneral">0.00</div>
+          <div class="label">Promedio General</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de Estudiantes -->
+    <div class="card">
+      <div class="table-header">
+        <h2>Listado de Estudiantes</h2>
+        <button id="btnLimpiar" class="btn btn-danger btn-sm">Limpiar Lista</button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Notas Válidas</th>
+              <th>Promedio</th>
+              <th>Calificación</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaEstudiantes">
+            <!-- Filas dinámicas -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/ejercicio2.js" defer></script>
+</body>
+</html>

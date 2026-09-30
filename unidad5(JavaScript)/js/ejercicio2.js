@@ -6,6 +6,7 @@ function estaAprobado(nota, minima=6){
     return nota>=minima;
 }
 
+
 export const estudiantes=[
     {nombre: "Ana", notas:[8,9,7.5]},
     {nombre: "Juan", notas:[4,5,5]},
@@ -14,7 +15,7 @@ export const estudiantes=[
     {nombre: "Lucia", notas:[3,4,5]}
 ];
 
-export const estudiantesConPromedio= estudiantes.map(est=>{
+const estudiantesConPromedio= estudiantes.map(est=>{
     const promedio=calcularPromedio(est.notas);
     return{
         ...est,
