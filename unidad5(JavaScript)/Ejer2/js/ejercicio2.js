@@ -1,38 +1,21 @@
 /**
- * UNIDAD 5A · JavaScript Fundamentos
- * Ejercicio 2 — Funciones, Arrays y Formulario
+ * UNIDAD 5A — JS + PHP Integración AJAX
  */
 
 // ==========================================
-// ETAPA 1 — Funciones y Arrays
+// ETAPA 1 — Funciones Matemáticas / Auxiliares
 // ==========================================
 
-/**
- * 1. Calcula el promedio de un array de números.
- * @param {number[]} notas
- * @returns {number}
- */
 function calcularPromedio(notas) {
   if (!notas || notas.length === 0) return 0;
   const suma = notas.reduce((acc, nota) => acc + nota, 0);
   return Number((suma / notas.length).toFixed(2));
 }
 
-/**
- * 2. Determina si una nota alcanza el mínimo especificado.
- * @param {number} nota 
- * @param {number} minima - Por defecto 6
- * @returns {boolean}
- */
 function estaAprobado(nota, minima = 6) {
   return nota >= minima;
 }
 
-/**
- * ETAPA 2 — Categorización de Calificación
- * @param {number} promedio 
- * @returns {string}
- */
 function obtenerCalificacion(promedio) {
   if (promedio >= 9) return "Sobresaliente";
   if (promedio >= 7.5) return "Muy bueno";
@@ -40,111 +23,115 @@ function obtenerCalificacion(promedio) {
   return "Desaprobado";
 }
 
-// --- Pruebas por Consola (Etapa 1 & 2) ---
-console.log("=== ETAPA 1: Pruebas de Funciones en Consola ===");
-console.log("Promedio [8, 9, 7.5]:", calcularPromedio([8, 9, 7.5])); // Expected: 8.17
-console.log("Promedio [3, 5, 4]:", calcularPromedio([3, 5, 4]));     // Expected: 4.00
-console.log("Promedio [10, 10]:", calcularPromedio([10, 10]));       // Expected: 10.00
-
-console.log("estaAprobado(6, 6):", estaAprobado(6, 6)); // Expected: true (caso límite)
-console.log("estaAprobado(5.9, 6):", estaAprobado(5.9, 6)); // Expected: false
-console.log("estaAprobado(6.5, 7):", estaAprobado(6.5, 7)); // Expected: false (mínimo modificado)
-
-// 3. Array inicial con 5 estudiantes
-const estudiantesIniciales = [
-  { nombre: "Laura Giménez", notas: [8, 9, 7.5] },
-  { nombre: "Carlos Gómez", notas: [3, 5, 4] },
-  { nombre: "Mariana Ríos", notas: [9, 9.5, 10] },
-  { nombre: "Esteban Paz", notas: [6, 6, 6] },
-  { nombre: "Lucía Fernández", notas: [2, 4, 5] }
-];
-
-// 4. map() para promedios
-const estudiantesConPromedio = estudiantesIniciales.map(est => ({
-  nombre: est.nombre,
-  notas: est.notas,
-  promedio: calcularPromedio(est.notas),
-  calificacion: obtenerCalificacion(calcularPromedio(est.notas))
-}));
-
-console.log("--- Tabla de Estudiantes (map) ---");
-console.table(estudiantesConPromedio);
-
-// 5. filter() para aprobados
-const aprobadosIniciales = estudiantesConPromedio.filter(est => estaAprobado(est.promedio, 6));
-
-console.log(`--- Aprobados: ${aprobadosIniciales.length} de ${estudiantesConPromedio.length} ---`);
-aprobadosIniciales.forEach(est => console.log(`- ${est.nombre}: Promedio ${est.promedio}`));
-
-
-// ==========================================
-// ETAPA 3 — Formulario e Interfaz Visual
-// ==========================================
-
-// Estado de la aplicación
-let listaEstudiantes = JSON.parse(localStorage.getItem("estudiantes_lgi")) || [...estudiantesIniciales];
-
-// Elementos del DOM
-const formEstudiante = document.getElementById("formEstudiante");
-const inputNombre = document.getElementById("inputNombre");
-const inputNotas = document.getElementById("inputNotas");
-const inputNotaMinima = document.getElementById("inputNotaMinima");
-const errorMsg = document.getElementById("errorMsg");
-const tablaEstudiantes = document.getElementById("tablaEstudiantes");
-const btnLimpiar = document.getElementById("btnLimpiar");
-
-// Elementos del Resumen
-const resTotal = document.getElementById("resTotal");
-const resAprobados = document.getElementById("resAprobados");
-const resDesaprobados = document.getElementById("resDesaprobados");
-const resPromedioGeneral = document.getElementById("resPromedioGeneral");
-
-/**
- * Parsea un texto de notas separadas por coma y filtra valores inválidos (0–10).
- * @param {string} textoNotas 
- * @returns {number[]} Array de números válidos
- */
 function parsearNotas(textoNotas) {
   if (!textoNotas) return [];
-  
   return textoNotas
     .split(",")
     .map(val => parseFloat(val.trim()))
     .filter(val => !isNaN(val) && val >= 0 && val <= 10);
 }
 
-/**
- * Renderiza la tabla y recalcula las estadísticas en base a la nota mínima actual.
- */
+// ==========================================
+// ETAPA 2 — Elementos del DOM
+// ==========================================
+
+const formEstudiante = document.getElementById("formEstudiante");
+const inputNombre = document.getElementById("inputNombre");
+const inputEmail = document.getElementById("inputEmail");
+const inputNotas = document.getElementById("inputNotas");
+const inputNotaMinima = document.getElementById("inputNotaMinima");
+const inputBuscador = document.getElementById("inputBuscador");
+
+const errorMsg = document.getElementById("errorMsg");
+const successMsg = document.getElementById("successMsg");
+const tablaEstudiantes = document.getElementById("tablaEstudiantes");
+
+const resTotal = document.getElementById("resTotal");
+const resAprobados = document.getElementById("resAprobados");
+const resDesaprobados = document.getElementById("resDesaprobados");
+const resPromedioGeneral = document.getElementById("resPromedioGeneral");
+
+// Modal
+const modalEditar = document.getElementById("modalEditar");
+const formEditarEstudiante = document.getElementById("formEditarEstudiante");
+const editId = document.getElementById("editId");
+const editNombre = document.getElementById("editNombre");
+const editEmail = document.getElementById("editEmail");
+const editNotas = document.getElementById("editNotas");
+
+let listaEstudiantes = [];
+
+function mostrarFeedback(msg, esError = false) {
+  if (esError) {
+    errorMsg.textContent = msg;
+    errorMsg.style.display = "block";
+    successMsg.style.display = "none";
+  } else {
+    successMsg.textContent = msg;
+    successMsg.style.display = "block";
+    errorMsg.style.display = "none";
+  }
+  setTimeout(() => {
+    errorMsg.style.display = "none";
+    successMsg.style.display = "none";
+  }, 3000);
+}
+
+// ==========================================
+// ETAPA 3 — API Fetch Operations
+// ==========================================
+
+async function cargarEstudiantes(termino = '') {
+  try {
+    const response = await fetch(`api/estudiantes.php?q=${encodeURIComponent(termino)}`);
+    if (!response.ok) throw new Error("Error en la respuesta del servidor");
+    
+    listaEstudiantes = await response.json();
+    renderizarUI();
+  } catch (error) {
+    console.error("Error al cargar estudiantes:", error);
+    mostrarFeedback("Error de comunicación con el servidor", true);
+  }
+}
+
 function renderizarUI() {
   const notaMinima = parseFloat(inputNotaMinima.value) || 6;
-
-  // Limpiar tabla
   tablaEstudiantes.innerHTML = "";
 
-  if (listaEstudiantes.length === 0) {
+  if (!Array.isArray(listaEstudiantes) || listaEstudiantes.length === 0) {
     tablaEstudiantes.innerHTML = `
       <tr>
-        <td colspan="6" style="text-align: center; color: #64748b;">No hay estudiantes cargados en la lista.</td>
+        <td colspan="7" style="text-align: center; color: #64748b;">No se encontraron estudiantes.</td>
       </tr>
     `;
+    resTotal.textContent = 0;
+    resAprobados.textContent = 0;
+    resDesaprobados.textContent = 0;
+    resPromedioGeneral.textContent = "0.00";
+    return;
   }
 
   let totalPromedios = 0;
   let contadorAprobados = 0;
 
-  listaEstudiantes.forEach((est, index) => {
-    const promedio = calcularPromedio(est.notas);
+  listaEstudiantes.forEach((est) => {
+    const notasArray = Array.isArray(est.notas) ? est.notas : [];
+    const promedio = calcularPromedio(notasArray);
     const aprobado = estaAprobado(promedio, notaMinima);
     const calificacion = obtenerCalificacion(promedio);
 
     totalPromedios += promedio;
     if (aprobado) contadorAprobados++;
 
+    const nombreEscapado = String(est.nombre || '').replace(/'/g, "\\'");
+    const emailEscapado = String(est.email || '').replace(/'/g, "\\'");
+    const notasTexto = notasArray.join(',');
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><strong>${est.nombre}</strong></td>
-      <td>${est.notas.join(", ")}</td>
+      <td>${est.email ? est.email : '<em>Sin correo</em>'}</td>
+      <td>${notasArray.length > 0 ? notasArray.join(", ") : "<em>Sin notas</em>"}</td>
       <td>${promedio.toFixed(2)}</td>
       <td>${calificacion}</td>
       <td>
@@ -153,13 +140,13 @@ function renderizarUI() {
         </span>
       </td>
       <td>
-        <button class="btn btn-danger btn-sm" onclick="eliminarEstudiante(${index})">✕</button>
+        <button class="btn btn-warning btn-sm" onclick="abrirModal(${est.id}, '${nombreEscapado}', '${emailEscapado}', '${notasTexto}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarEstudiante(${est.id})">✕</button>
       </td>
     `;
     tablaEstudiantes.appendChild(tr);
   });
 
-  // Actualizar resumen
   const total = listaEstudiantes.length;
   const desaprobados = total - contadorAprobados;
   const promedioGeneral = total > 0 ? (totalPromedios / total).toFixed(2) : "0.00";
@@ -168,68 +155,120 @@ function renderizarUI() {
   resAprobados.textContent = contadorAprobados;
   resDesaprobados.textContent = desaprobados;
   resPromedioGeneral.textContent = promedioGeneral;
-
-  // Persistir en localStorage
-  localStorage.setItem("estudiantes_lgi", JSON.stringify(listaEstudiantes));
 }
 
-/**
- * Maneja el evento submit del formulario
- */
-formEstudiante.addEventListener("submit", (e) => {
+// ==========================================
+// ETAPA 4 — Event Listeners & CRUD
+// ==========================================
+
+// Agregar Estudiante (POST)
+formEstudiante.addEventListener("submit", async (e) => {
   e.preventDefault();
-  errorMsg.style.display = "none";
 
   const nombre = inputNombre.value.trim();
+  const email = inputEmail ? inputEmail.value.trim() : "";
   const notasValidas = parsearNotas(inputNotas.value);
 
-  // Validación: si no se ingresó ninguna nota válida
   if (!nombre || notasValidas.length === 0) {
-    errorMsg.textContent = "Error: Debe ingresar un nombre y al menos una nota válida (entre 0 y 10).";
-    errorMsg.style.display = "block";
+    mostrarFeedback("Ingrese un nombre y al menos una nota válida (0-10).", true);
     return;
   }
 
-  // Agregar nuevo estudiante
-  listaEstudiantes.push({
-    nombre: nombre,
-    notas: notasValidas
-  });
+  try {
+    const res = await fetch("api/estudiantes.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombre: nombre, email: email, notas: notasValidas })
+    });
 
-  // Limpiar campos del formulario
-  inputNombre.value = "";
-  inputNotas.value = "";
-  inputNombre.focus();
-
-  renderizarUI();
+    const data = await res.json();
+    if (res.ok) {
+      mostrarFeedback("Estudiante agregado correctamente.");
+      inputNombre.value = "";
+      if (inputEmail) inputEmail.value = "";
+      inputNotas.value = "";
+      cargarEstudiantes(inputBuscador.value.trim());
+    } else {
+      mostrarFeedback(data.message || "Error al agregar", true);
+    }
+  } catch (err) {
+    mostrarFeedback("Error en el servidor al intentar agregar.", true);
+  }
 });
 
-/**
- * Recalcula estados dinámicamente si cambia la nota mínima
- */
+// Buscador en tiempo real
+inputBuscador.addEventListener("input", (e) => {
+  cargarEstudiantes(e.target.value.trim());
+});
+
+// Recalcular estado con nota mínima
 inputNotaMinima.addEventListener("input", () => {
   renderizarUI();
 });
 
-/**
- * Elimina un estudiante por índice
- * @param {number} index 
- */
-window.eliminarEstudiante = function(index) {
-  listaEstudiantes.splice(index, 1);
-  renderizarUI();
+// Eliminar Estudiante (DELETE)
+window.eliminarEstudiante = async function(id) {
+  if (!confirm("¿Está seguro de eliminar este estudiante?")) return;
+
+  try {
+    const res = await fetch(`api/estudiantes.php?id=${id}`, { method: "DELETE" });
+    if (res.ok) {
+      mostrarFeedback("Estudiante eliminado.");
+      cargarEstudiantes(inputBuscador.value.trim());
+    } else {
+      mostrarFeedback("Error al eliminar el estudiante.", true);
+    }
+  } catch (err) {
+    mostrarFeedback("Error en la conexión al eliminar.", true);
+  }
 };
 
-/**
- * Limpia toda la lista
- */
-btnLimpiar.addEventListener("click", () => {
-  if (listaEstudiantes.length === 0) return;
-  if (confirm("¿Está seguro de que desea limpiar toda la lista de estudiantes?")) {
-    listaEstudiantes = [];
-    renderizarUI();
+// Modales y Edición (PUT)
+window.abrirModal = function(id, nombre, email, notas) {
+  editId.value = id;
+  editNombre.value = nombre;
+  if (editEmail) editEmail.value = email;
+  editNotas.value = notas;
+  modalEditar.style.display = "flex";
+};
+
+window.cerrarModal = function() {
+  modalEditar.style.display = "none";
+};
+
+formEditarEstudiante.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const id = parseInt(editId.value);
+  const nombre = editNombre.value.trim();
+  const email = editEmail ? editEmail.value.trim() : "";
+  const notasValidas = parsearNotas(editNotas.value);
+
+  if (!nombre || notasValidas.length === 0) {
+    alert("Datos inválidos");
+    return;
+  }
+
+  try {
+    const res = await fetch("api/estudiantes.php", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, nombre, email, notas: notasValidas })
+    });
+
+    if (res.ok) {
+      mostrarFeedback("Estudiante actualizado exitosamente.");
+      cerrarModal();
+      cargarEstudiantes(inputBuscador.value.trim());
+    } else {
+      mostrarFeedback("Error al actualizar.", true);
+    }
+  } catch (err) {
+    mostrarFeedback("Error de conexión al actualizar.", true);
   }
 });
 
-// Carga inicial al abrir la página
-document.addEventListener("DOMContentLoaded", renderizarUI);
+// Inicializar
+document.addEventListener("DOMContentLoaded", () => {
+  cargarEstudiantes();
+});

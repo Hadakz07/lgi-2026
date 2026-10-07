@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ejercicio 2 — Funciones, Arrays y Formulario</title>
+  <title>Gestión de Calificaciones de Estudiantes</title>
   <style>
     :root {
       --primary: #2563eb;
@@ -27,20 +27,12 @@
     }
 
     .container {
-      max-width: 900px;
+      max-width: 950px;
       margin: 0 auto;
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 0.5rem;
-    }
-
-    p.subtitle {
-      text-align: center;
-      color: #64748b;
-      margin-bottom: 2rem;
-    }
+    h1 { text-align: center; margin-bottom: 0.5rem; }
+    p.subtitle { text-align: center; color: #64748b; margin-bottom: 2rem; }
 
     .card {
       background: var(--card-bg);
@@ -52,7 +44,7 @@
 
     form {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1rem;
       align-items: end;
     }
@@ -63,11 +55,7 @@
       gap: 0.35rem;
     }
 
-    label {
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-
+    label { font-weight: 600; font-size: 0.9rem; }
     input {
       padding: 0.6rem;
       border: 1px solid var(--border);
@@ -89,28 +77,13 @@
       transition: background-color 0.2s;
     }
 
-    .btn-primary {
-      background-color: var(--primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background-color: var(--primary-hover);
-    }
-
-    .btn-danger {
-      background-color: var(--danger);
-      color: white;
-    }
-
-    .btn-danger:hover {
-      background-color: #b91c1c;
-    }
-
-    .btn-sm {
-      padding: 0.25rem 0.5rem;
-      font-size: 0.85rem;
-    }
+    .btn-primary { background-color: var(--primary); color: white; }
+    .btn-primary:hover { background-color: var(--primary-hover); }
+    .btn-danger { background-color: var(--danger); color: white; }
+    .btn-danger:hover { background-color: #b91c1c; }
+    .btn-warning { background-color: var(--warning); color: white; }
+    .btn-warning:hover { background-color: #b45309; }
+    .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.85rem; margin-right: 0.2rem; }
 
     .error-msg {
       background-color: #fef2f2;
@@ -122,27 +95,20 @@
       display: none;
     }
 
-    /* Tabla */
-    .table-container {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-
-    th, td {
+    .success-msg {
+      background-color: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: var(--success);
       padding: 0.75rem;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
+      border-radius: 6px;
+      margin-top: 1rem;
+      display: none;
     }
 
-    th {
-      background-color: #f1f5f9;
-      font-weight: 600;
-    }
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background-color: #f1f5f9; font-weight: 600; }
 
     .badge {
       padding: 0.2rem 0.5rem;
@@ -150,18 +116,9 @@
       font-size: 0.85rem;
       font-weight: 600;
     }
+    .badge-aprobado { background-color: #dcfce7; color: var(--success); }
+    .badge-desaprobado { background-color: #fee2e2; color: var(--danger); }
 
-    .badge-aprobado {
-      background-color: #dcfce7;
-      color: var(--success);
-    }
-
-    .badge-desaprobado {
-      background-color: #fee2e2;
-      color: var(--danger);
-    }
-
-    /* Resumen */
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -177,35 +134,44 @@
       text-align: center;
     }
 
-    .summary-box .value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--primary);
-    }
+    .summary-box .value { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+    .summary-box .label { font-size: 0.85rem; color: #64748b; }
+    .table-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
 
-    .summary-box .label {
-      font-size: 0.85rem;
-      color: #64748b;
-    }
-
-    .table-header {
-      display: flex;
-      justify-content: space-between;
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
       align-items: center;
+    }
+    .modal-content {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 450px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Gestión de Calificaciones de Estudiantes</h1>
-    <p class="subtitle">Unidad 5A — JavaScript Fundamentos (Ejercicio 2)</p>
+    <p class="subtitle">Integración Fetch + PHP (CRUD Completo)</p>
 
-    <!-- Formulario -->
+    <!-- Formulario Agregar -->
     <div class="card">
       <form id="formEstudiante">
         <div class="form-group">
           <label for="inputNombre">Nombre del estudiante</label>
           <input type="text" id="inputNombre" placeholder="Ej. Ana Pérez" required>
+        </div>
+
+        <div class="form-group">
+          <label for="inputEmail">Correo electrónico</label>
+          <input type="email" id="inputEmail" placeholder="Ej. ana@gmail.com">
         </div>
 
         <div class="form-group">
@@ -218,12 +184,14 @@
           <input type="number" id="inputNotaMinima" value="6" min="1" max="10" step="0.5" required>
         </div>
 
-        <div>
+        <div style="grid-column: 1 / -1;">
           <button type="submit" class="btn btn-primary" style="width: 100%;">Agregar Estudiante</button>
         </div>
       </form>
 
+      <!-- Mensajes de respuesta -->
       <div id="errorMsg" class="error-msg"></div>
+      <div id="successMsg" class="success-msg"></div>
     </div>
 
     <!-- Resumen del Grupo -->
@@ -249,11 +217,12 @@
       </div>
     </div>
 
-    <!-- Lista de Estudiantes -->
+    <!-- Lista y Buscador -->
     <div class="card">
       <div class="table-header">
         <h2>Listado de Estudiantes</h2>
-        <button id="btnLimpiar" class="btn btn-danger btn-sm">Limpiar Lista</button>
+        <!-- Buscador -->
+        <input type="text" id="inputBuscador" placeholder="🔍 Buscar estudiante..." style="max-width: 250px;">
       </div>
 
       <div class="table-container">
@@ -261,6 +230,7 @@
           <thead>
             <tr>
               <th>Nombre</th>
+              <th>Email</th>
               <th>Notas Válidas</th>
               <th>Promedio</th>
               <th>Calificación</th>
@@ -269,10 +239,36 @@
             </tr>
           </thead>
           <tbody id="tablaEstudiantes">
-            <!-- Filas dinámicas -->
+            <!-- Filas dinámicas mediante fetch -->
           </tbody>
         </table>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal de Edición -->
+  <div id="modalEditar" class="modal">
+    <div class="modal-content">
+      <h3>Editar Estudiante</h3>
+      <form id="formEditarEstudiante" style="display: flex; flex-direction: column; gap: 1rem;">
+        <input type="hidden" id="editId">
+        <div class="form-group">
+          <label for="editNombre">Nombre</label>
+          <input type="text" id="editNombre" required>
+        </div>
+        <div class="form-group">
+          <label for="editEmail">Correo electrónico</label>
+          <input type="email" id="editEmail">
+        </div>
+        <div class="form-group">
+          <label for="editNotas">Notas (separadas por coma)</label>
+          <input type="text" id="editNotas" required>
+        </div>
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+          <button type="button" class="btn" onclick="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+      </form>
     </div>
   </div>
 
