@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Productos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .stock-bajo { background-color: #f8d7da !important; }
+    </style>
+</head>
+<body class="bg-light p-4">
+    <div class="container bg-white p-4 rounded shadow-sm">
+        <h2 class="mb-4">Gestión de Productos</h2>
+
+        <!-- Formulario -->
+        <form id="form-producto" class="row g-3 mb-4">
+            <input type="hidden" id="producto-id">
+            <div class="col-md-4">
+                <input type="text" id="nombre" class="form-control" placeholder="Nombre del producto" required>
+            </div>
+            <div class="col-md-3">
+                <input type="number" id="precio" class="form-control" step="0.01" min="0" placeholder="Precio ($)" required>
+            </div>
+            <div class="col-md-3">
+                <input type="number" id="stock" class="form-control" min="0" placeholder="Stock" required>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100" id="btn-guardar">Guardar</button>
+                <button type="button" class="btn btn-secondary d-none" id="btn-cancelar">Cancelar</button>
+            </div>
+        </form>
+
+        <!-- Buscador, Botón de Venta y Métricas (Unificados y con IDs únicos) -->
+        <div class="row align-items-center mb-3">
+            <div class="col-md-5">
+                <input type="text" id="buscar" class="form-control" placeholder="🔍 Buscar producto...">
+            </div>
+            <div class="col-md-7 text-end d-flex justify-content-end align-items-center gap-2">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalVenta" onclick="cargarSelectProductos()">🛒 Registrar Venta</button>
+                <span class="badge bg-info text-dark fs-6">Valor Total Inventario: <strong id="valor-total">$0,00</strong></span>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Ajuste Rápido</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-productos">
+                    <!-- Filas cargadas dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de Ventas -->
+    <div class="modal fade" id="modalVenta" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"> Nueva Venta </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Formulario para agregar producto al carrito -->
+                    <div class="row g-2 mb-3 align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label">Seleccionar Producto</label>
+                            <select id="venta-producto-id" class="form-select">
+                                <!-- Se llena dinámicamente -->
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Cantidad</label>
+                            <input type="number" id="venta-cantidad" class="form-control" min="1" value="1">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-primary w-100" onclick="agregarAlCarrito()">Agregar</button>
+                        </div>
+                    </div>
+
+                    <!-- Tabla del Carrito -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Precio Unit.</th>
+                                    <th>Cantidad</th>
+                                    <th>Subtotal</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-carrito">
+                                <!-- Items agregados dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <h4 class="text-end mt-3">Total Venta: <span id="carrito-total">$0,00</span></h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" onclick="finalizarVenta()">Confirmar y Guardar Venta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle (Esencial para que el modal y bootstrap.Modal funcionen) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
